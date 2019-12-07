@@ -42,7 +42,7 @@
                 </FormattedString>
             </TextView>
 
-            <Button text="Button" @tap="onButtonTap" />
+            <Button text="ButtonChange" @tap="onButtonTap" />
 
 
             <Button text="Co-Rent" @tap="onButtonTapCorent" />
