@@ -1,5 +1,5 @@
 <template>
-    <Page>
+    <Page @navigatedTo="onNavigatedTo">
 
         <ActionBar title="Login" />
 
@@ -30,6 +30,16 @@
 <script>
     export default {
         methods: {
+
+            onNavigatedTo() {
+                if (this.logoff) {
+                    this.logoff = "";
+                    this.$navigateBack();
+                }
+
+                console.log(this.logoff)
+            },
+
             async onButtonTapLogin() {
                 console.log(this.username + this.password);
 
@@ -51,29 +61,27 @@
                 if (response.ok) {
                     // var data = await response.json();
                     await confirm({
-                            title: "Login success",
-                            message: "",
-                            okButtonText: "Yes ",
-                             });
-                            global.username = this.username;
-                            this.$navigateBack();
-                            // location.replace('/');
-                        }
-                        else if (response.status == 401) {
-                            var data = await response.text();
-                            await confirm(data);
-                        } else {
-                            await confirm(response.statusText);
-                        }
-                    }
-                },
-
-                data() {
-                    return {
-                        
-                    };
+                        title: "Login success",
+                        message: "",
+                        okButtonText: "Yes "
+                    });
+                    global.username = this.username;
+                    this.$navigateBack();
+                    // location.replace('/');
+                } else if (response.status == 401) {
+                    var data = await response.text();
+                    await confirm(data);
+                } else {
+                    await confirm(response.statusText);
                 }
-            };
+            }
+        },
+
+        props: ["logoff", "$delegate"],
+        data() {
+            return {};
+        }
+    };
 </script>
 
 <style>

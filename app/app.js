@@ -7,6 +7,8 @@ import Home from './components/Home';
 
 global.rootURL = "https://39cda204.ngrok.io";
 global.username = "";
+global.selectID = "";
+global.selectEstate = "";
 
 new Vue({
 

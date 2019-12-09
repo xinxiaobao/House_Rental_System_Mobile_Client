@@ -26,21 +26,21 @@
                 </TabStrip>
 
                 <TabContentItem>
-                    <ListView for="feed in feeds" @itemTap="onItemTapDetail">
+                    <ListView for="feed in feedsHighlight"
+                        @itemTap="onItemTapDetail">
                         <v-template>
                             <StackLayout orientation="vertical">
                                 <Image :src="feed.URL" height="300" />
 
                                 <Label :text="feed.title" class="h1" />
-                                <Label :text="feed.name" class="h3" />
 
+                                <FlexboxLayout flexDirection="column"
+                                    margin="10">
+                                    <Label :text="feed.name" class="t-20" />
+                                    <Label :text=" 'Rent:$ ' + feed.rent"
+                                        class="t-20" />
+                                </FlexboxLayout>
 
-                                <TextView editable="false">
-
-                                    <Span text="Rent:$ " class="h3" />
-                                    <Span :text="feed.rent" class="h3" />
-
-                                </TextView>
 
                             </StackLayout>
                         </v-template>
@@ -93,8 +93,8 @@
                         </FlexboxLayout>
 
                         <Button text="Login/Logoff" class="h1 left"
-                            @tap="onButtonTapUser" />
-                        <Button text="My Rentals" class="h1 left"
+                            height="100" @tap="onButtonTapUser" />
+                        <Button text="My Rentals" class="h1 left" height="100"
                             @tap="onButtonTapMyrental" />
 
                     </StackLayout>
@@ -131,8 +131,8 @@
                         });
                     if (response.ok) {
                         this.houselist = await response.json();
-                        console.log(JSON.stringify(this.houselist
-                        .rentto));
+
+                        this.myrentals = this.houselist.rentto;
 
                         this.$navigateTo(HouseList, {
                             transition: {},
@@ -150,7 +150,7 @@
                     confirm({
                         title: "Please Login",
                         message: "",
-                        okButtonText: "Yes "
+                        okButtonText: "OK "
                     });
                 }
             },
@@ -161,7 +161,10 @@
                         transition: {},
                         transitionIOS: {},
                         transitionAndroid: {},
-                        props: {}
+                        props: {
+                            logoff: "",
+                            $delegate: this
+                        }
                     });
                 } else {
                     var result = await confirm({
@@ -173,17 +176,28 @@
 
                     if (result) {
                         global.username = "";
+
+                        this.$navigateTo(Login, {
+                            transition: {},
+                            transitionIOS: {},
+                            transitionAndroid: {},
+                            props: {
+                                logoff: "1",
+                                $delegate: this
+                            }
+                        });
                     }
                 }
             },
 
-            onItemTapDetail: function(args) {
+            onItemTapDetail: async function(args) {
                 this.$navigateTo(Detail, {
                     transition: {},
                     transitionIOS: {},
                     transitionAndroid: {},
                     props: {
                         selectedhouse: args.item,
+                        myrentals: this.myrentals,
                         $delegate: this
                     }
                 });
@@ -191,25 +205,12 @@
 
             onItemTapEstate: function(args) {
                 console.log("Item with index: " + args.index + " tapped");
-                console.log("house selected: " + args.item.name);
+                console.log("house selected: " + args.item);
 
-                if (args.index == 0) {
-                    this.houselist = this.feeds.filter(function(p) {
-                        return p.name == "City One Shatin";
-                    });
-                } else if (args.index == 1) {
-                    this.houselist = this.feeds.filter(function(p) {
-                        return p.name == "Festival City";
-                    });
-                } else if (args.index == 2) {
-                    this.houselist = this.feeds.filter(function(p) {
-                        return p.name == "Whampoa Garden";
-                    });
-                } else if (args.index == 3) {
-                    this.houselist = this.feeds.filter(function(p) {
-                        return p.name == "Island Resort";
-                    });
-                }
+                global.selectEstate = args.item;
+                this.houselist = this.feeds.filter(function(p) {
+                    return p.name == global.selectEstate;
+                });
 
                 this.$navigateTo(HouseList, {
                     transition: {},
@@ -251,7 +252,7 @@
 
         async mounted() {
             this.username = global.username;
-            console.log("0000");
+
             var response = await fetch(global.rootURL + "/house/json", {
                 method: "GET",
                 credentials: "same-origin"
@@ -262,13 +263,19 @@
             } else {
                 console.log(response.statusText);
             }
+
+            this.feedsHighlight = this.feeds.filter(function(p) {
+                return p.box == true;
+            });
         },
 
         data() {
             return {
                 username: "",
                 feeds: [],
+                feedsHighlight: [],
                 houselist: [],
+                myrentals: [],
 
                 estates: [
                     "City One Shatin",

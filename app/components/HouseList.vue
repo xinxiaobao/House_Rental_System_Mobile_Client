@@ -7,12 +7,13 @@
 
 
         <ListView for="house in houselist" @itemTap="onItemTapDetail"
-            style="height:1250px">
+            >
             <v-template>
                 <FlexboxLayout flexDirection="row">
 
-                    <Label :text="house.title" class="t-12"
-                        style="width: 60%" />
+                    <Label :text="house.title" class="t-20"
+                    height="60p"
+                        />
                 </FlexboxLayout>
             </v-template>
         </ListView>
